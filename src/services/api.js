@@ -3,14 +3,29 @@
  */
 
 export function getBackendBaseUrl() {
-  return localStorage.getItem('ssh_backend_url') || 'http://localhost:5050';
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('ssh_backend_url');
+    // Bersihkan otomatis jika di localStorage browser tersimpan URL lama localhost
+    if (saved && (saved.includes('localhost:') || saved.includes('127.0.0.1:'))) {
+      try {
+        localStorage.removeItem('ssh_backend_url');
+      } catch (_) {}
+    }
+  }
+
+  const currentSaved = typeof window !== 'undefined' ? localStorage.getItem('ssh_backend_url') : null;
+  const envUrl = import.meta.env?.VITE_BACKEND_URL;
+  const url = currentSaved || envUrl || 'http://192.168.199.40:5051';
+  return url.replace(/\/+$/, '');
 }
 
 export function setBackendBaseUrl(url) {
-  if (url) {
-    localStorage.setItem('ssh_backend_url', url.trim());
-  } else {
-    localStorage.removeItem('ssh_backend_url');
+  if (typeof window !== 'undefined') {
+    if (url && url.trim()) {
+      localStorage.setItem('ssh_backend_url', url.trim().replace(/\/+$/, ''));
+    } else {
+      localStorage.removeItem('ssh_backend_url');
+    }
   }
 }
 

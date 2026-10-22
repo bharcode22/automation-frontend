@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FiTerminal, FiSettings, FiServer, FiRefreshCw, FiUploadCloud, FiFileText } from 'react-icons/fi';
+import { getBackendBaseUrl, setBackendBaseUrl } from '../services/api';
 
 export default function Navbar({
   servers = [],
@@ -15,7 +16,7 @@ export default function Navbar({
   return (
     <header className="sticky top-0 z-50 bg-[#0c101c]/90 backdrop-blur-md border-b border-slate-800/80 px-6 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
-        
+
         {/* Brand & Server Switcher */}
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-3">
@@ -57,13 +58,30 @@ export default function Navbar({
           )}
 
           {/* Backend Status Pill */}
-          <div className={`hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border ${
-            isOnline
+          <div
+            title={`Backend Server: ${getBackendBaseUrl()} (Klik alamat IP untuk mengubah)`}
+            className={`hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border ${isOnline
               ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'
               : 'bg-rose-500/10 text-rose-400 border-rose-500/25'
-          }`}>
+              }`}
+          >
             <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse-dot' : 'bg-rose-400'}`} />
             <span>{isOnline ? `Online (${backendHealth.uptimeSeconds || 0}s)` : 'Backend Offline'}</span>
+            <button
+              onClick={() => {
+                const current = getBackendBaseUrl();
+                const input = window.prompt('Ubah URL Backend Service (kosongkan untuk reset ke default http://192.168.199.40:5051):', current);
+                if (input !== null) {
+                  setBackendBaseUrl(input.trim());
+                  checkHealth();
+                  window.location.reload();
+                }
+              }}
+              title="Klik untuk mengubah URL backend"
+              className="text-[10px] text-sky-300 hover:text-white font-mono bg-slate-950/80 px-2 py-0.5 rounded border border-slate-700 hover:border-sky-400/60 cursor-pointer transition-colors"
+            >
+              {getBackendBaseUrl().replace(/^https?:\/\//, '')}
+            </button>
             <button
               onClick={checkHealth}
               title="Perbarui status backend"
@@ -80,10 +98,9 @@ export default function Navbar({
             to="/"
             end
             className={({ isActive }) =>
-              `flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                isActive
-                  ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              `flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${isActive
+                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`
             }
           >
@@ -94,10 +111,9 @@ export default function Navbar({
           <NavLink
             to="/config"
             className={({ isActive }) =>
-              `flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                isActive
-                  ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              `flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${isActive
+                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`
             }
           >
@@ -113,10 +129,9 @@ export default function Navbar({
           <NavLink
             to="/upload"
             className={({ isActive }) =>
-              `flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                isActive
-                  ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              `flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${isActive
+                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`
             }
           >
@@ -127,10 +142,9 @@ export default function Navbar({
           <NavLink
             to="/metadata"
             className={({ isActive }) =>
-              `flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                isActive
-                  ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              `flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${isActive
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`
             }
           >
