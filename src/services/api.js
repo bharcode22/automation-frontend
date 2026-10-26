@@ -239,5 +239,48 @@ export async function generateMetadataFromDb(targetServerId, broadcast = false) 
   return json;
 }
 
+/**
+ * Execute whitelisted script in /home/pod/scripts/exec (./kill-process.sh or ./auto-script.sh)
+ *
+ * @param {Object} options
+ * @param {string} options.targetServerId - Server name, id, or host
+ * @param {string} options.scriptName - 'kill-process.sh' or 'auto-script.sh'
+ * @param {boolean} [options.broadcast=false] - If true, executes on all PODs
+ * @param {number} [options.timeoutMs=90000]
+ */
+export async function runPodScript({ targetServerId, scriptName, broadcast = false, timeoutMs = 90000 }) {
+  const base = getBackendBaseUrl();
+  const res = await fetch(`${base}/api/ssh/scripts/run`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      targetServerId,
+      scriptName,
+      broadcast,
+      timeoutMs
+    })
+  });
+  const json = await res.json();
+  if (!res.ok && !json.results) {
+    throw new Error(json.error || `Gagal mengeksekusi script (${res.status})`);
+  }
+  return json;
+}
 
+/**
+ * List available shell scripts in /home/pod/scripts/exec
+ *
+ * @param {string} targetServerId
+ */
+export async function fetchPodScripts(targetServerId) {
+  const base = getBackendBaseUrl();
+  const params = new URLSearchParams();
+  if (targetServerId) params.set('target', targetServerId);
 
+  const res = await fetch(`${base}/api/ssh/scripts/list?${params.toString()}`);
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.error || `Gagal mengambil daftar script (${res.status})`);
+  }
+  return json;
+}
